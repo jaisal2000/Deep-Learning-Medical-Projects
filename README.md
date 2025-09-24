@@ -2,7 +2,16 @@
 
 ## Project Overview
 
-This project implements and evaluates a deep learning pipeline for classifying brain tumors from MRI scans. It compares the performance, interpretability, and robustness of a classic Convolutional Neural Network (CNN) against a modern Vision Transformer (ViT) architecture. The entire project is implemented in a Google Colab notebook using PyTorch and other open-source libraries.
+This project is a foundational study into the architectural differences between Convolutional Neural Networks (CNNs) and Vision Transformers (ViTs) for the task of medical image classification. While both architectures have achieved state-of-the-art results, their internal mechanisms are fundamentally different. This work seeks to move beyond a simple comparison of accuracy metrics to investigate how these differences translate to performance, interpretability, and reliability in a clinical context.
+
+### Research Questions (Motivation)
+
+This project serves as a preliminary investigation into the following questions:
+
+1.  **How does the architectural paradigm (local convolutions vs. global self-attention) influence a model's ability to localize salient pathological features in brain MRI scans?** Is the superior theoretical receptive field of a ViT reflected in more precise and interpretable class activation maps?
+2.  **Are CNNs and ViTs equally robust to the types of data variations common in clinical settings?** How do they perform under synthetic domain shifts like imaging noise and contrast variations, and do their failure modes differ?
+
+To address these questions, we implement, train, and rigorously evaluate a fine-tuned ResNet-34 (CNN) and a Vision Transformer (ViT) on a public brain tumor MRI dataset.
 
 ---
 
@@ -72,7 +81,30 @@ The Grad-CAM heatmaps reveal a key difference in how the models "see" the tumors
 ![alt text](image-3.png)
 
 ---
+## Future Work and Research Directions
 
+The findings from this project open up several promising avenues for future research, transitioning from comparative analysis to hypothesis-driven experimentation.
+
+#### 1. Hypothesis-Driven Robustness Analysis
+- **Observation:** The ViT is robust to noise, while the CNN is robust to brightness shifts.
+- **Future Work:** Design a controlled experiment to systematically test the hypothesis that self-attention mechanisms are inherently better at ignoring unstructured, high-frequency noise, while convolutional filters are better at learning features invariant to global low-frequency changes. This would involve titrating noise levels and frequency bands and observing the performance degradation curves for each architecture.
+
+#### 2. Self-Supervised Pre-training with In-Domain Data
+- **Limitation:** Both models were pre-trained on ImageNet, which has a vastly different data distribution than medical images.
+- **Future Work:** Implement a self-supervised pre-training strategy, such as a **Masked Autoencoder (MAE)**, on a large, unlabeled corpus of brain MRIs (e.g., from the TCGA database). The central research question would be: *Does in-domain self-supervised pre-training lead to more robust, data-efficient, and generalizable models compared to standard ImageNet pre-training?*
+
+#### 3. Exploration of Hybrid Architectures
+- **Observation:** CNNs and ViTs have complementary robustness profiles.
+- **Future Work:** Design and evaluate a **hybrid CNN-Transformer architecture**. This could involve using a convolutional stem for patch embedding to leverage its stability with contrast changes, while retaining the Transformer body for its superior localization and noise robustness. The goal would be to create a model that inherits the best properties of both paradigms.
+
+#### 4. Advanced Uncertainty Quantification and Out-of-Distribution Detection
+- **Limitation:** MC Dropout provides a basic uncertainty estimate.
+- **Future Work:** Implement and compare more advanced uncertainty quantification techniques like **Deep Ensembles** or **Conformal Prediction**. A key goal would be to build a system that can not only predict a class but also provide a calibrated confidence score, allowing it to reliably **reject** making predictions on out-of-distribution or ambiguous samples, which is critical for clinical safety.
+
+#### 5. Extension to Multi-Modal and 3D Data
+- **Limitation:** The current project uses 2D JPEG slices from a single MRI sequence.
+- **Future Work:** Extend the models to handle full 3D volumetric data and multi-modal MRI sequences (T1, T2, FLAIR). This introduces the research challenge of **information fusion**: investigating how to best combine data from multiple sources within the model architecture, for example, through early fusion, late fusion, or dedicated cross-attention mechanisms between modalities.
+---
 ## How to Run This Project
 
 1.  **Setup (Cell 0):** Mount Google Drive and install required libraries like `timm` and `pytorch-grad-cam`.
